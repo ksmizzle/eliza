@@ -28,6 +28,7 @@ import {
     ICacheManager,
 } from "@elizaos/core";
 import { RedisClient } from "@elizaos/adapter-redis";
+import { devSchoolPlugin } from "@elizaos/plugin-devschool";
 import { zgPlugin } from "@elizaos/plugin-0g";
 import { bootstrapPlugin } from "@elizaos/plugin-bootstrap";
 import createGoatPlugin from "@elizaos/plugin-goat";
@@ -67,6 +68,9 @@ import path from "path";
 import { fileURLToPath } from "url";
 import yargs from "yargs";
 import net from "net";
+
+import { userDataProvider } from "./userDataProvider";
+import { userDataEvaluator } from "./userDataEvaluator";
 
 const __filename = fileURLToPath(import.meta.url); // get the resolved path to the file
 const __dirname = path.dirname(__filename); // get the name of the directory
@@ -516,10 +520,11 @@ export async function createAgent(
         databaseAdapter: db,
         token,
         modelProvider: character.modelProvider,
-        evaluators: [],
+        evaluators: [userDataEvaluator],
         character,
         // character.plugins are handled when clients are added
         plugins: [
+            devSchoolPlugin,
             bootstrapPlugin,
             getSecret(character, "CONFLUX_CORE_PRIVATE_KEY")
                 ? confluxPlugin
@@ -601,7 +606,7 @@ export async function createAgent(
                 ? avalanchePlugin
                 : null,
         ].filter(Boolean),
-        providers: [],
+        providers: [userDataProvider],
         actions: [],
         services: [],
         managers: [],
